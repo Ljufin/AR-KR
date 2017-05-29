@@ -1,0 +1,585 @@
+Class 1:
+5 people in this class
+Me
+Omar
+David
+Scott
+
+
+Class topics:
+Learn logic programming:
+Specification language: for describing and modeling systems
+Class follows the Theory of Computation backbone
+Focus on the logical side of knowledge representation
+
+Company:
+candence: electronic design automation
+
+Solver:
+Provides answers and solutions to a model
+
+First half of lab1p1, 4 predicates of form P(x), "x is P"
+Starting character determines "type"
+lower case = constants = atoms = predicate names
+upper case = variables
+
+a '.' signifies that an predicate is true. Usually signifies a "fact"
+
+':-' is used to declare a rule. ',' is used to say 'and'.
+'or' can be implemented using 2 rules
+
+queries return the definitions that were declared first(see lab 1 part 1)
+
+'=' is a 'unification predicate', "Is there a way to unify the things?"
+'X = mary', X = john' returns no becuase X cannot be both mary and john
+Another form is '=(X, john)'
+predicates are the core of the language
+more: '=(parent(X, mary), parent(john,Y))' X = john Y = mary
+
+
+Class #2:
+Looking at some syntax:
+Predicates: p(x,y,z), z(x,y), r(x), mother(mary,john)
+p(term1,term2,...,termn)
+
+
+There is a "universe" of terms in proloq
+what kind of things could be inside the predicates? Arguments?
+Base terms:
+-atoms: lower-case, constant
+-variables: upper-case
+-numbers, eg 3, 3.14...
+Compound terms:
+-functor(term1,term2,...,termn) e.g. s in lab #3
+A "ground term" is a term that only has constants
+
+Lab #3:
+s is the succesor functor
+The first 2 lines create a simple number system, zero is the first term
+2nd line is 'if something is a successor and a natural number, then the successor is a natural number'
+It does this using unification as does the solver
+This line makes use of recursion
+
+xPlusYisZ(s(s(zero)), s(zero), Z) = 'Z = s(s(s(zero)))'
+Zero is the base and the number of successors determines the number
+xPlusYisZ(s(s(zero)), Y, s(s(zero))) is like solving 2+Y=2
+
+3rd line: if X is natural and Y is zero, then Z is X
+5th line: Defines addition in terms of the successors
+The successors method of representing numbers ( s(s(s(s(s(.....) is a ineficient method of knowledge representation
+
+s(s(zero)) = s(X) is asking if the term with the variable X can be made to look like the other side of the equation
+f( s(s(zero)), s(f(X)) ) = f(Y,Z)
+functors should be the same in order to unify
+
+CLASS #3:
+This class covers the pure Prolog
+ECLiPSe adds the contraints
+
+examining 'natural(X):- X=s(X1), natural(X1).' using quantifiers:
+"For all X, if there is a natural number that is a predecessor, X1, then X is a natural number"
+'natural(zero) is an example of a atomic goal
+
+'natural(p(zero)) = natural(zero)'
+This doesn't work because p(zero) can't be unified with natural(zero)
+
+'natural(s(p(zero))) = natural(X)'
+works because X can just be s(p(zero))
+
+'natural(p(zero))'
+This does not work:
+s(p(zero)) = s(X1), natural(X1) ---> natural(s(p(zero)))
+'s(p(zero)) = s(X1)'
+X1 could be p(zero) ---> 'X1 = p(zero)'
+This attaches a constraint to 'natural(X1)' ---> 'natural(p(zero))' --->
+'natural(p(zero)) :- p(zero) = s(X1), natural(X1)' ---> 'p(zero) = s(X1)' does not unify
+
+'natural(s(Y))'
+first result is Y = zero
+
+
+Query: sequence of atomic goals
+
+CLASS #4 2/8
+Lists are a recursive structure
+Similar to linked list
+A compound term that represents a list
+[] is a special term to represent an empty list
+[.|..] is a special functor with 2 arguments head '.' and tail '..'.
+tail must be a list
+[a,b,c] is a short-hand of [ a|[b |[ c|[] ] ] ]
+
+Reasoning about the atomic goal 'app(X,Y, [1])':
+Rewriting that rule: app(P, Ys, Q) :- P= [X|Xs], Q=[X|Zs], app(Xs, Ys, Zs).'
+This is like the style in lab1 #4 where 'literals' are used
+It is always possible to write rules into this form
+
+CLASS #5
+Going through the exercises
+Focusing on 1.5:
+try the query app(As, Bs, [1,2,2,3,1,2])
+The first result will be As = [], Bs = [1,2,2,3,1,2] because app(As, Bs, [1,2,2,3,1,2]) unifies with app([], Ys, Ys)
+Pressing 'more' will backtrack to 'app(As, Bs, Xs)' as a choice point and will find another solution for this goal.
+
+CLASS #6
+Ex 1.3-2 returns true because the Z's are in different scopes
+The Z is in its own scope entirely which makes the rule q(X) :- Z = 1. be basically the fact q(X).
+'_' is a convenient way to avoid having that variable be outputted.
+Every '_' is different.
+In Ex 1.4, 'Behold' is the same variable
+For Prolog, the 'states' are the constraints that have been created on the variables.
+The solver works by navigating the tree of choice-points.
+Parameters can be used to describe the structure of a rule. EX: example 4
+Endless answers are different from there being endless without answers.
+It is important to be aware of the solver's limitations when writing Prolog
+
+CLASS #7:
+Prospective students sat in today.
+When converting to L0, change the parameters of the predicate to same thing.
+Recursion in L0 works the same as normal recursion.
+Analyze xPlusYisZ(X,Y,Z) with xPlusYisZ(s(s(zero)), Y, Z):
+
+CLASS #8:
+Analyzing the real number program again:
+ "xPlusYisZ(s(s(zero)), Y, Z)" is a generator of pairs of Y and Z that satisfy the query.
+ natural(X) is also a generator.
+The first solution of "xPlusYisZ(s(s(zero)), Y, Z)" takes the first choice of rules.
+The second solution skips the 1st and 2nd rules and goes to the 3rd.
+Changing the orders of the unifiers sometimes can have differing effects.
+"xPlusYisZ(X, s(s(zero)), Z)" overflows, why?
+Infinite solutions for natural(X) in the first rule, but with nothing that will actually work for Y=zero.
+This can be fixed by flipping the order of the natural(X) and the Y=zero in the rule.
+I FIXED THE EXAMPLE!!!!!!
+The reason that solver works in the order that user gives it instead of doing
+something smart is to let the user have for control over the behavior.
+I wonder what would happen if this was the first programming language that someone
+was introduced to...would it be easier or harder to pick up than a van neuman language?
+
+"xPlusYisZ(X, Y, s(s(zero)))" diverges, why?
+the 1st rule gets stuck at natural(X) which generates infinite numbers trying to unify Z=X.
+Switching the goals again gets us past that issue and the same for the next rule.
+After switching these, we get 2 solutions instead of just 1 before it diverges.
+Why does the 3rd rule diverge?
+The first few goals deal with succession, and that's a problem with the 'zero' case.
+Once again, switching some things around makes things better.
+There is a thing called cut '!' which might help this situation.
+
+CLASS #9:
+Today, we will start to cover chapter 3.
+'3+4=4+3' returns no because the solver tries to unify 3 with 4 and 4 with 3.
+'3+4' is the same as '+(3,4)'
+'Y is 3+4' is the same as 'is(Y, 4+3)'
+'GAE' = 'Ground Arithmetic Expression'
+"A variable is some expression that doesn't include a variable or that variable
+is already set to some by value by the state of the program"
+The '^' operator is included.
+'div' always truncates to the smallest number
+'//' will truncate to make the result closer to 0.
+The 'is' operator always needs to be used for evaluating arithmetic expressions.
+The behavior of the SELECT program is interesting, especially 'Min1 is Min+1'
+
+CLASS #10:
+Looking at the example ordered program:
+It only will work for numbers because of the arithmetic operator '=<'
+Now we're looking at the example quicksort on pg50:
+What is quicksort? Example:
+[3,5,8,1,9,2]
+3 is a pivot (pivot can be a random element)
+Put remaining elements that are < the pivot into the list, littles
+Everything else(>=) goes into the list, bigs.
+then do the same thing with the partitions.
+then put all the partitions together with the pivots in the middle.
+After all the recursion, the list is sorted.
+The core of the program then, is the part/=4 predicate.
+Because loops are not present, the program will recursively break the lists
+down based on the first element.
+Does it make a difference if we swap the order of the goals in the rule for partition?
+Let's experiment:
+With a long enough lists, the swap makes it take longer.
+
+CLASS #11:
+There is process of accumulating constraints
+These are called 'active' constraints.
+Things like 'X>Y' aren't active because they don't have any kind of unification.
+There are libraries in ECLiPSe that make it possible to have active constraints
+of this kind.
+The infix operator format lead to ambiguity.
+'xfy' means that you can put parentheses around the right-hand side of the operator.
+'yfx' means the same thing but inverse.
+solve(Q) :- Q. works as sort of a Prolog interpreter for queries.
+The 'Q'  on the right means the Q is 'executed'
+Q is a 'meta-variable'
+In Prolog, it is possible to treat the contents of a variable like a program.
+Meta-programming makes structure and data the same in Prolog.
+
+CLASS #12:
+Today we are going to talk about the cut operator.
+It can be more accurately described as 'commit and discard'
+First, we're going to talk about some other things.
+';' is the disjunction operator.
+This means 'or' because it is defined as two rules that basically check if
+X or Y is true based on whether X is true or Y is true.
+We wrote a new program to experiment: disjunction.ecl
+This is a good example of the idea of meta-programming.
+A compound term could also mean something like a code segment, like nesting the
+disjunction predicate that we made.
+Now lets explore the 'once' predicate, I added it my earlier program.
+The program will reach the cut the first time that 'Q' is true.
+Removing the cut will give all the solutions.
+Now let's define 'no'(like not).
+It essentially means that 'if there exists a Q that is true, then fail'.
+There is also a 'if then else' operator defined as '->'
+An example of its use is in the ORDERED example program from the book.
+We modified the ORDERED program to say No when the error message is displayed.
+The definition for '->' is on p68 of the book.
+I also added it to the file.
+'cut' is controversial because it isn't a pure logic expression.
+It is very useful in some situations though, for example the book uses it to
+optimize the QUICKSORT example.
+
+CLASS #13:
+Continuing on chapter 4, looking into meta-programming a little bit more.
+We spent awhile  at the beginning of class trying to get the 'dynamic' predicate working.
+The 'clause' predicate is used to find the head and body of a rule.
+This is helpful for meta-programming.
+The example 4.4 is an interpreter that counts the number of computations needed to
+get the solution.
+'dynamic' allows you to ask queries about things in the program.
+You can also change the definition of the predicates.
+It is therefore possible to have a program 'learn' about new rules by dynamically
+changing the rules.
+It is possible to have multiple compiled files at the same time,
+this is why you should use the 'make' button to recompile instead of going to the
+compile menu under file. Doing it that way just loads another file that is the original
+file, with the changes that have been made. This can have very bad results.
+Selection sort:
+#1: find the smallest in the tail, and then put it as the head.
+#2: finding the smallest element should be pretty easy
+#3: Can I remove the smallest element from a list?
+Ask "what is the smallest one" "is it the head?" keep it, "is it in the tail?"
+recursively narrow down the list to find the smallest.
+You can use a triangular recursion method where you continually find the smallest
+element and append it to the final list.
+
+CLASS #14:
+We will talk about chapter 5 today.
+This is an extension of the ability to read Prolog programs as data
+We will use the example quicksort program with the added dynamic statements.
+There is no real distinction between data and program.
+"var" checks if the structure is a variable.
+"nonvar" is the inverse of that.
+"ground" checks that the structure has no variables.
+There are also the '==' and '\==' operators that check literal equality like
+in a normal programming language?
+Looking at the various version of the LIST program on p79
+The first version is not good in the case of variable input, it will unify the
+variable to something that is a list.
+Therefore, the '==' operator should be used in order to fix that case.
+The second version causes the query to diverge.
+The reason for this is because list(X) is still being asked, only now with
+infinite recursion.
+The solution to this is to use the "nonvar" operator in the second clause.
+Now we look at the VARIABLES example program. figure 5.2
+Looking at the "vars" predicate
+First clause: if Term is an atom, then the list is always empty.
+Second clause: If Term is a variable, the output is the singleton list of that variable
+Note: if the query is something like "vars(Z,Z)" the result will be
+Z=[] because the first clause will unify Z with the empty list, which is atomic
+the "functor/3" operator asks about the predicate name and the number of terms.
+Another use for "functor/3" is to give a predicate name and a number of arguments
+and the query will construct a structure based on that.
+The built in "arg\3" predicate retrieves the Kth argument of  a structure.
+The 'args/3' predicate in the example program breaks down and searches argument
+structures in order to find the variables.
+Now lets look at the MAP example program. fig 5.3 p84
+We added "square" and "cube" predicates that do exactly what they are called
+Now we try the query "map(cube, [1,2,3], Results)"
+It is obvious that map works like a "foreach" in C++
+"=.." is called the univ predicate
+It is an infix operator.
+It unifies with a structure constructed from the things in the list.
+The example uses the =../2 to create a query and then execute it.
+
+CLASS #15:
+We went over the test today.
+I got 28/35 with 30 being 100%
+Therefore, I got ~93, much better than I thought.
+Now we are starting to get into constraint programming, which is part 3 of the book
+Looking at the SEND+MORE=MONEY problem.
+It is possible to model the problem using constraint programming.
+No leading zeroes
+S,E,N,D,M,O,R,Y are the unique digits 0 - 9
+10^3*S+10^2*E+10*N+D
++
+10^3*M+10^2*O+10*R+E
+=
+10^4*M+10^3*O+10^2*N+10*E+Y
+
+We need to look for solutions to these constaints
+ECLiPSe creates a language that combines logic and constraints together.
+Right now, we can't handle equality constraints with numbers ex: "3 =< X" aborts
+Overall, constraint programming is very similar to logic programming.
+Ideally, we want something that is very similar to the unification algorithm.
+
+CLASS #16:
+Taking a look at chapter 6, which is purely theoretical.
+It contains problems that can be solved using constraint programming
+Looking at the source code for the SEND+MORE=MONEY solution in the book
+There is only one solution
+Brute forcing means checking 100 million combinations.
+or wait is it 10! instead?
+There are tones of constraint satisfaction problems that is why programs like
+ECLiPSe are useful.
+One of the big reasons for constraint programming is implementing more efficient
+search algorithms.
+There are several different ways to represent the SEND+MORE=MONEY problem
+We looked at one that uses the carries and another that uses the relative values
+in multiples of 10.
+In the real world, there is more than one way to model a problem.
+Constraints are very similar to the unification algorithm.
+Another way to solve the problem is checking if all the variables are different.
+You do this by asking if a variable is a 1-9 for all the variables.
+The sum of the results for a single variable is always 1 since only one can be true.
+There are a few other problems in this chapter.
+n-queens is another example.
+The currency design problem is really interesting, I should look more into it...
+
+CLASS #17:
+Today we start looking into chapter 7 with iterators
+Format:
+(
+  iterationSpecification
+  do
+  query
+)
+
+This structure is not part of pure Prolog
+This structure is the "do" predicate defined using meta-programming.
+An example of the "foreach" predicate is "( foreach(E1, [a,b,c]) do writeln(E1) )"
+There is also a "count" predicate that loops through the nature numbers
+EX: "( count(I, 1, 4) do writeln(I) )"
+While these appear similar to C++ iterators, they are not actually the same.
+It is possible to have 2 iterators in a loop:
+"( foreach(E1, [a,b,c,d]), count(I, 1, _) do writeln(I-E1) )"
+To get the max length of the list, change the anonymous variable to a normal variable
+This can be used to better find the length of the list, an example is on p115
+The computer does this really fast.
+These loops make it possible to write many more constraints than would be
+convenient by hand.
+
+CLASS #18:
+Magic squares:
+Get the sum of all the numbers
+for n=2, total for row/column is 10/2=5
+No solution for n=2
+n-3 has a solution
+1+...+9 = 10-*5/2 = 45
+45/3 = 15 for each row/column
+
+Scott presents his independent study:
+Talking about Alloy Modeling Language
+Similar to Prolog in concept but different syntax and usage.
+Used for verifying and designing data structures.
+Close to being an object orientated language.
+The signatures (man and woman for example) are disjoint sets.
+The "lone" means that there is 0 or 1 objects in the field
+The "extends" keyword means a kind of child class relationship. Each use of "extends"
+creates a new partition.
+sig A{} = set of atoms A
+sig B extends A{} B is a subset of A
+Making hierarchies is possible through this last command.
+sig A{f:e} = f is a binary relations with domain A and range given by expression e
+A.f =  the collection of things in e that have the relationship f.
+signature = object = set
+"fact" is how constraints are made in Alloy.
+"transitive closure" all the things you can get to by relations.
+"pred show() {}" is like declaring a main function.
+"assert" is not as strong as fact and will produce an instance that proves the thing wrong.
+"+" is the same as union.
+"^" is used to denote the transitive closure.
+
+CLASS #19:
+The n-queens problem is a good example of why recursion is important.
+An example solution is "(2,4,1,3)"
+This is read by going column by column down.
+In the first column, the queen is in the second row...
+Looking into 7.4 at the dim/2 predicate
+"dim(X, [4])" will create an array of 4 variables.
+"dim(X, [2,4,5])" will create a 3 dimensional array.
+Multi-dimensional arrays are implemented as nested arrays.
+"dim(X, [4]), subscript(X, [1], 0)" will set the first element of X to zero
+"dim(Arr, [4]), subscript(Arr, [3], 0), subscript(Arr, [3], Z)" is like reading from
+an array, Z = 0.
+[9,8,7,6] = [](9,8,7,6) will fail since arrays do not equal lists.
+The "." predicate is used for lists while "[]" is used for arrays.
+"for(J,1,Number)" means for J from 1 to J==Number?
+This implementation is basically a brute force technique.
+param is needed for all external variables in the query part
+
+CLASS #20:
+Continuing our exploration of chapter 7.
+'writeln' is a predicate that I didn't know about, I knew about 'write' already
+'do' is an infix operator and can also be used in the prefix notation
+Let's try some of the examples from the book.
+Looking at the example on p117
+This one adds the var to each element of the list
+Each iteration in the loop produces a different variable for writeln(Var).
+Now let's look at the program on page p118.
+The iterations specifications can grab from the global scope, but the body cannot
+grab from the global scope without the use of param.
+count and for treat the parameter differently.
+This class we got lost enough to have to look at the online reference manual
+The page on all the do-loops gives a description of what do actually calls
+The non-recursive length program is a good example of iterations scoping
+
+CLASS #21:
+Review of the iterators in chapter 7
+'foreacharg' can be used to iterate through structures
+Now we are looking at the homework 5 in order to better understand iterators
+For the recursive list sum, the base cases should be the empty and singleton list
+The recursive step is to add the head plus the total of the tail.
+The non-recusive version of ORDERED fig 7.6 is a good example of the fromto iterator
+by itself.
+
+CLASS #22:
+Let's look at the magic square assignment p109
+For this assignment, just do n=3
+You need a two-dimensional array to store the solution
+You will do this by what is essentially brute force guessing
+The outer loop is responsible for guessing.
+Supposing we generate complete solutions and then check(David's solution):
+we need to figure out how to get unique numbers.
+we could create a list and then fill it with numbers from 1 to n^2
+listNsquare(N,List)
+Given N, makes List = [1,2,3...N*N]
+This might be a test question
+Nsquare is N*N
+(
+count(E,1,Nsquare)
+foreach(E, List)
+do
+true
+)
+This works perfectly
+Now lets try to create a permute predicate
+Y is a permutation of X
+permute([X],Y):-
+X=Y,
+!.
+permute(X,Y)):-
+%using the rotate predicate
+removeOneElem(X, OneElem, Remaininglist),
+permute(Remaininglist, PermutationOfRemainingList),
+Y=[OneElem | PermutationOfRemaininList]
+.
+
+removeOneElem(X, OneElem, Remaininglist):-
+%like the one I did for selection sort
+
+CLASS #23:
+We are going to be speeding through chapters 8,9,10
+Chapter 8 talks about searching.
+Just remember things like that the order of the variables is important.
+Heuristic: a general rule, but not a proof.
+The predicates in the 8.7 summary can best be explained by looking at Fig. 8.16
+These have to do with lowercase variables.
+'twice' counts the number of times that Q can succeed, and then test if the number is 2.
+The 'x' is shared through the predicates in one/1
+Variable and value orderings are really important
+Now moving on to chapter 9 and the suspend library.
+'$' operators are for comparing real numbers
+'#' operators are for comparing integers
+These are passive constraints in the suspend library
+However, in the ic library, these are active constraints.
+This means that these work smarter, and more like unification.
+The suspend library basically just keeps things from crashing in instantiation faults
+The ic and sd library are talked about in chapter 10
+A list of constraints in the suspend library can be found in 9.8, p180
+Another version of the NQueens program using constraints is on p179
+The first predicate sets the dimensions, defines the constraints, and then searches
+The constraints/2 predicate is interesting because it defines the constraints instead
+of checking if certain values meet the constraints.
+It works more on defining the relationships between variables.
+The search process is still very similar, using select_val to put queens in by row
+For the chapter 11 version, the constraints part is the same, just using ic library.
+11b version is much faster than the chapter 7 version
+Take-home test yaaaah
+
+CLASS #24:
+Going to talk about the magic square program.
+Take home exam notes: Some of the problems will be similar to hw 5.
+Back to hw 6.
+Look at the framework for how to use multifor in hopes of maybe fixing that stupid type error
+Dr. Lin proved the magic sum in class
+Divide the sum of 1+...+N^2 by N.
+Another way to implement the column check is to transpose the square matrix and check the rows again.
+The way to do the hard diagonal is the for (i,j), (i, N=1-i).
+
+CLASS #25:
+We are going to look into chapter 11 today
+Looking at the backtrack free n-queens program on p207
+This search is imcomplete because it doesn't search everything
+get_min/2 sets Col to the minimum value in its domain
+get_max is also valid.
+Active constraints remove some of the possible options from the brute force method
+Backtrack free means that the program never goes back to change a variable
+Version b uses the indomain/1 predicate.
+This version works a lot better than the last one
+This is a complete search
+Version c converts the Queensstruct to a list to reorder the variables
+
+CLASS #26:
+Let's continue our exploration of chapter 11
+Looking at the queens programs again
+Let's look into the search/6 predicate
+Normally, there is no choice in the order of the variables
+But sometimes is better to have a different variable ordering as seen on p222
+This example uses the fact the middle queens determine more values than the outer ones
+the first_fail heuristic chooses the variables with the fewest values left in its domain
+This is used in the 4th search on p224
+The search predicate is actually really powerful, and cheating basically
+Their magic square program is so much faster than mine :(
+The point today was to understand to power of variable orderings and heuristics
+One final example will be about doing simple things using iterators and recursion
+The second components will be solving problems
+
+CLASS #27:
+Looking at the COINS program on p236
+What we want to do is create a function that finds the most optimal solution
+Now we're looking at the knapsack problem.
+Objects have both volume and value
+The knapsack itself has a capacity limit
+This is the "0-1" knapsack where you have to take all of the object or none of it.
+The question is, which objects should you take in order to maximize the total value
+This problem is NP-complete
+This is essentially an optimization problem.
+Look at Fig 12.1 on p233
+There is a minimize/2 predicate provided by the branch_and_bound library
+The first arg must be a search/goal and the second is something that defines an objective function
+labeling() is a predicate that does indomain for all variables in a list
+The overall structure of programs with optimization are pretty similar to the
+define, constrain, search structure from earlier.
+Now looking at the COINS program.
+
+
+CLASS #28:
+Looking over the final today
+It is possible to generate SEND + MORE = MONEY problems with ECLiPSe
+The currency section is based on things in chapter 12
+B3, maybe do the primes or fib
+Make a file for A and a file for B
+For part 1, there are actually only 3 things to do since we did the first 2 in an earlier assignment.
+Use iterators for part 1
+Constraint programming is about learning how to represent knowledge and to reason about these things
+Let's look more into part 2 and chapter 12
+Looking into the COINS example from chapter 12
+"C #=< Coin" compares the resulting number to the number of coins that we have
+"Pockets" is a list of the CoinsforPrice lists for 1 to 99
+Our goal with this program is to find the minimal number of coins to make up 1 to 99
+"check(pockets)" checks the constraints from labeling(Coins)
+Min keeps track of the minimum value of Coins that we have seen so far
+ For each CoinsforPrice, check(Pockets) labels the variables in the CoinsforPrice list
+ "once" means that the expression finds one solution and then quits
+ This checks if the solution given by labeling(Coins) is valid
+ The currency design problem is basically this program where the values of the coins are variables
+ 
