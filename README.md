@@ -1,7 +1,7 @@
 # CS480:  Knowledge Representation and Automatic Reasoning
 
 This repository is for the projects that I worked on while in this class. There were also a few other assignments that were not
-included, but these were either very simple homeworks/labs or reading assignemnts. I really didn't want to upload 30 Word docs that
+included, but these were either very simple homeworks/labs or reading assignments. I really didn't want to upload 30 Word docs that
 aren't very interesting.
 
 ## About the class:
